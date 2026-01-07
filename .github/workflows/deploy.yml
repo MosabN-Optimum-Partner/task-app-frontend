@@ -28,3 +28,10 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ env.REPO_LC }}:latest
+      - name: Fresh start
+        run: |
+          docker compose down frontend || ture
+          docker system prune -a -f
+          docker image prune -a -f
+          docker container prune -a -f
+          docker compose up frontend || ture
