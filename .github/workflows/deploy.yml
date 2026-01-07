@@ -37,9 +37,9 @@ jobs:
               echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
               cd /home/mosab-nasrallah/Desktop/composer
               docker compose down frontend || true
-              docker system prune -a -f
-              docker image prune -a -f
-              docker container prune -a -f
+              docker system prune -f
+              docker image prune -f
+              docker container prune -f
               docker compose pull frontend
               docker compose up -d frontend || true
         
