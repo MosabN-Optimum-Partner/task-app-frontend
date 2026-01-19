@@ -1,0 +1,5 @@
+dbUser: "admin"
+dbPassword: "password123"
+dbName: "taskapp"
+backendImage: "ghcr.io/mosabn-optimum-partner/task-app-backend:latest"
+frontendImage: "ghcr.io/mosabn-optimum-partner/task-app-frontend:latest"

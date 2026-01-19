@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-backend-task-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-api
+  template:
+    metadata:
+      labels:
+        app: backend-api
+    spec:
+      containers:
+        - name: backend-container
+          image: {{ .Values.backendImage | quote }}
+          env:
+            - name: DB_HOST
+              value: "postgres-service" 
+            - name: DB_USER
+              value: {{ .Values.dbUser | quote }}
+            - name: DB_PASSWORD
+              value: {{ .Values.dbPassword | quote }}
+            - name: DB_NAME
+              value: {{ .Values.dbName | quote }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Installing tools"
+              if command -v apt-get >/dev/null; then
+                apt-get update && apt-get install -y postgresql-client
+              else
+                apk add --no-cache postgresql-client
+              fi
+
+              echo "Applying schema from init.sql..."
+              PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -f /app/init.sql
+
+              echo "Starting server..."
+              node server.js
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-task-service
+spec:
+  selector:
+    app: backend-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3002
